@@ -162,8 +162,57 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def expectimax(state, agentIndex, depth):
+            #we stop if we win or lose or reach the maximum depth and return the value from the evaluation function
+            if depth == self.depth or state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+            
+            #get the number of agents in the game
+            numAgents = state.getNumAgents()
+
+            # if it's pacman's turn (maximizing player in our case)
+            if agentIndex == 0:
+                bestValue = float("-inf")
+                for action in state.getLegalActions(0):
+                    successor = state.generateSuccessor(0, action)
+                    value = expectimax(successor, 1, depth)
+                    if value > bestValue:
+                        bestValue = value
+                return bestValue
+
+            # this one is for the ghosts (chance nodes in our case)
+            actions = state.getLegalActions(agentIndex)
+            if len(actions) == 0:
+                #if we don't have any legal actions in the current state, we return the evaluation function value
+                return self.evaluationFunction(state)
+            # calculate the expected value over all the posible actions
+            prob = 1.0 / float(len(actions))
+            expectedValue = 0.0
+            #then for each legal action we have, we generate the successor state and call expectimax recursively for all of them
+            for action in actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                nextAgent = (agentIndex + 1) % numAgents
+                nextDepth = depth + 1 if nextAgent == 0 else depth
+                value = expectimax(successor, nextAgent, nextDepth)
+                expectedValue += prob * value
+
+            return expectedValue
+
+        # now here, we start the expectimax algorithm from the root node (the current game state)
+        bestAction = None
+        bestValue = float("-inf")
+
+        # for each legal action for pacman, we generate the succesor state and call expectimax for it
+        for action in gameState.getLegalActions(0):
+            successor = gameState.generateSuccessor(0, action)
+            value = expectimax(successor, 1, 0)
+            if value > bestValue:
+                bestValue = value
+                bestAction = action
+
+        return bestAction
+
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
