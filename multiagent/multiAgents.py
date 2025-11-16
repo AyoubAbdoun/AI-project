@@ -75,6 +75,47 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
+        def manhattanDistance(xy1,xy2):
+         return abs(xy1[0]-xy2[0]) + abs(xy1[1]-xy2[1])
+        
+        if successorGameState.isWin():
+            return float('inf')
+        else:
+            pass
+            
+        if successorGameState.isLose():
+            pass
+
+        foodProximity = 50
+        ghostPos = currentGameState.getGhostPositions(1)
+        ghostDis= manhattanDistance(newPos, ghostPos[0])
+        scoreTotal = max(ghostDis,5)+successorGameState.getScore()
+        gameList = newFood.asList()
+
+        for food in gameList:
+            currentDistance = manhattanDistance(newPos, food)
+            if( foodProximity > currentDistance):
+                foodProximity = currentDistance
+            else:
+                pass
+        
+        if action == Directions.STOP:
+            scoreTotal -= 2
+        else:
+            pass
+
+        penalty = 2 * foodProximity
+        scoreTotal -= penalty
+        currentCapsules = currentGameState.getCapsules()
+        
+        if successorGameState.getPacmanPosition() in currentCapsules:
+            scoreTotal += 60
+        else:
+            pass
+
+        return scoreTotal
+
+
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState: GameState):
@@ -103,7 +144,7 @@ class MultiAgentSearchAgent(Agent):
     """
 
     def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
-        self.index = 0 # Pacman is always agent index 0
+        self.index = 0 
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
@@ -111,32 +152,56 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
     Your minimax agent (question 2)
     """
+    def determineAction(self, gameState, depth, agentIndex=0):
+    # Base case: terminal state or depth limit reached
+        if gameState.isWin() or gameState.isLose() or depth == 0:
+            return self.evaluationFunction(gameState), None 
+        
+        numberOfGhosts = gameState.getNumAgents() - 1
+        
+        if agentIndex == numberOfGhosts:
+            currentDepth = depth - 1
+            newIndex = 0
+        else:
+            currentDepth = depth
+            newIndex = agentIndex + 1
+        
+        allPossibleActions = []
+        for action in gameState.getLegalActions(agentIndex): 
+            successorState = gameState.generateSuccessor(agentIndex, action) 
+            value = self.determineAction(successorState, currentDepth, newIndex)[0]
+            allPossibleActions.append((value, action))
+        
+        if agentIndex == 0:  
+            return max(allPossibleActions) 
+        else:  
+            return min(allPossibleActions) 
 
-    def getAction(self, gameState: GameState):
-        """
-        Returns the minimax action from the current gameState using self.depth
-        and self.evaluationFunction.
+def getAction(self, gameState):
+    """
+    Returns the minimax action from the current gameState using self.depth
+    and self.evaluationFunction.
+    
+    Here are some method calls that might be useful when implementing minimax.
+    
+    gameState.getLegalActions(agentIndex):
+    Returns a list of legal actions for an agent
+    agentIndex=0 means Pacman, ghosts are >= 1
+    
+    gameState.generateSuccessor(agentIndex, action):
+    Returns the successor game state after an agent takes an action
+    
+    gameState.getNumAgents():
+    Returns the total number of agents in the game
+    
+    gameState.isWin():
+    Returns whether or not the game state is a winning state
+    
+    gameState.isLose():
+    Returns whether or not the game state is a losing state
+    """
+    return self.determineAction(gameState, self.depth)[1]  
 
-        Here are some method calls that might be useful when implementing minimax.
-
-        gameState.getLegalActions(agentIndex):
-        Returns a list of legal actions for an agent
-        agentIndex=0 means Pacman, ghosts are >= 1
-
-        gameState.generateSuccessor(agentIndex, action):
-        Returns the successor game state after an agent takes an action
-
-        gameState.getNumAgents():
-        Returns the total number of agents in the game
-
-        gameState.isWin():
-        Returns whether or not the game state is a winning state
-
-        gameState.isLose():
-        Returns whether or not the game state is a losing state
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
