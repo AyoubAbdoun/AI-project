@@ -32,12 +32,20 @@ def forward_check(domains, var, value, n, assignment):
 
 
 def select_unassigned_variable_mrv(domains, assignment):
+# Pick the column that has the fewest legal rows left
+# Because that column is the hardest one, solving it first reduces backtracking
     best_var = None
     best_size = None
+    # var = column index
+    # val = row or None (if not assigned)
     for var, val in enumerate(assignment):
         if val is not None:
-            continue
+            continue # If this column already has a queen, ignore it
+        
+        # how many options are left
+        # domains[var] = set of allowed rows
         size = len(domains[var])
+
         if best_var is None or size < best_size:
             best_var = var
             best_size = size
@@ -45,8 +53,11 @@ def select_unassigned_variable_mrv(domains, assignment):
 
 
 def solve_backtracking_forward_checking(n):
+    # create one domain per column
+    # initially every column can place a queen in every row
+    # forward checking will shrink these sets as we assign queens
     domains = [set(range(n)) for _ in range(n)]
-    assignment = [None] * n
+    assignment = [None] * n # build the current partial assignment list
     explored_nodes = 0
     checked_assignments = 0
     consistency_checks = 0
@@ -55,17 +66,20 @@ def solve_backtracking_forward_checking(n):
     def backtrack():
         nonlocal explored_nodes, checked_assignments, consistency_checks, solution
 
+        # check whether the search has reached a full assignment
+        # all(...) checks if every column has an assigned row
         if all(v is not None for v in assignment):
             checked_assignments += 1
             if is_safe_full(assignment):
-                solution = list(assignment)
+                solution = list(assignment) # assignment[col] = row
                 return True
             return False
 
         var = select_unassigned_variable_mrv(domains, assignment)
         if var is None:
-            return False
+            return False # no legal rows
 
+        # For this column, try every row that is still allowed, one by one
         for value in sorted(domains[var]):
             explored_nodes += 1
 
