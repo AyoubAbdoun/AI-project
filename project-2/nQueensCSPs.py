@@ -18,8 +18,7 @@ def is_safe_full(assignment):
     return True
 
 
-# 1) Naive enumeration --------------------------------------------------------
-
+# 1) Naive enumeration 
 
 def solve_naive(n):
     board = [0] * n
@@ -58,7 +57,7 @@ def solve_naive(n):
     }
 
 
-# 2) Backtracking + Forward Checking (MRV) ------------------------------------
+# 2) Backtracking + Forward Checking (MRV) 
 
 
 def forward_check(domains, var, value, n, assignment):
@@ -169,8 +168,7 @@ def solve_backtracking_forward_checking(n):
     }
 
 
-# 3) Backtracking + AC-3 (MRV) ------------------------------------------------
-
+# 3) Backtracking + AC-3 (MRV) 
 
 def constraint_ok(col_i, row_i, col_j, row_j):
     if row_i == row_j:
@@ -276,8 +274,7 @@ def solve_backtracking_ac3(n):
     }
 
 
-# 4) Randomized Local Search (Min-Conflicts) ----------------------------------
-
+# 4) Randomized Local Search (Min-Conflicts) 
 
 def conflicts_for_column(board, col):
     n = len(board)
@@ -352,8 +349,7 @@ def min_conflicts(n, max_steps=100000):
     }
 
 
-# Printing helpers ------------------------------------------------------------
-
+# Printing helpers 
 
 def print_board(solution):
     if solution is None:
@@ -393,9 +389,7 @@ def time_str():
     return time.strftime("%H:%M:%S")
 
 
-# Main driver -----------------------------------------------------------------
-
-
+# Main
 def main():
     ns = []
     for arg in sys.argv[1:]:
