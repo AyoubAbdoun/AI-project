@@ -7,7 +7,7 @@ from min_conflicts import min_conflicts
 from naive_enumeration import solve_naive
 
 
-# Printing helpers 
+# Printing helpers
 
 def print_board(solution):
     if solution is None:
@@ -17,6 +17,7 @@ def print_board(solution):
     for r in range(n):
         row_chars = []
         for c in range(n):
+            # Is the queen in column c placed in row r?
             if solution[c] == r:
                 row_chars.append("Q")
             else:
@@ -50,10 +51,11 @@ def time_str():
 # Main
 def main():
     ns = []
+    # read command-line arguments and  collect all valid integer args
     for arg in sys.argv[1:]:
         if arg.lstrip("-").isdigit():
             ns.append(int(arg))
-    if not ns:
+    if not ns: # list is empty
         ns = [8]
 
     print(f"Run started at {time_str()}")
