@@ -86,6 +86,8 @@ def solve_backtracking_forward_checking(n):
             old_domains = [d.copy() for d in domains]
             old_assignment_value = assignment[var]
 
+            # copy list because we dont want to modify the real assignment yet
+            # update the real assignment after forward checking confirms that the move is valid
             tmp_assignment = assignment[:]
             new_domains, checks, failure = forward_check(
                 old_domains, var, value, n, tmp_assignment
